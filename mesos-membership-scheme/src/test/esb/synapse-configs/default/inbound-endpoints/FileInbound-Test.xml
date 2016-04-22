@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inboundEndpoint name="FileInbound-Test" onError="fault" protocol="file"
+                 sequence="FileInboundRouteSeq" suspend="false" xmlns="http://ws.apache.org/ns/synapse">
+    <parameters>
+        <parameter name="interval">5000</parameter>
+        <parameter name="sequential">true</parameter>
+        <parameter name="coordination">false</parameter>
+        <parameter name="transport.vfs.ContentType">application/xml</parameter>
+        <parameter name="transport.vfs.LockReleaseSameNode">false</parameter>
+        <parameter name="transport.vfs.AutoLockRelease">false</parameter>
+        <!--parameter name="transport.vfs.AutoLockReleaseInterval">5000</parameter-->
+        <parameter name="transport.vfs.ActionAfterFailure">MOVE</parameter>
+        <parameter name="transport.vfs.ActionAfterProcess">MOVE</parameter>
+        <parameter name="transport.vfs.FileURI">file:///mnt/mesos-artifacts/esb/in</parameter>
+        <parameter name="transport.vfs.MoveAfterFailure">file:///mnt/mesos-artifacts/esb/error</parameter>
+        <parameter name="transport.vfs.DistributedLock">true</parameter>
+        <parameter name="transport.vfs.FileNamePattern">.*\.*</parameter>
+        <parameter name="transport.vfs.MoveAfterProcess">file:///mnt/mesos-artifacts/esb/out</parameter>
+        <parameter name="transport.vfs.Locking">enable</parameter>
+        <parameter name="transport.vfs.FileSortAttribute">lastmodifiedtimestamp</parameter>
+        <parameter name="transport.vfs.FileSortAscending">false</parameter>
+        <parameter name="transport.vfs.CreateFolder">true</parameter>
+        <parameter name="transport.vfs.FileProcessCount">10</parameter>
+        <parameter name="transport.vfs.Streaming">false</parameter>
+        <parameter name="transport.vfs.Build">false</parameter>
+    </parameters>
+</inboundEndpoint>

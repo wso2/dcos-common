@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="FileInboundRouteSeq" onError="fault" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <property xmlns:ns="http://org.apache.synapse/xsd" expression="$body" name="ORIGINAL_PAYLOAD" scope="default"
+              type="OM"/>
+    <call>
+        <endpoint>
+            <http method="get" uri-template="http://jsonplaceholder.typicode.com/posts/1"/>
+        </endpoint>
+    </call>
+    <property xmlns:ns="http://org.apache.synapse/xsd" expression="$body" name="BACKEND_RESPONSE" scope="default"
+              type="OM"/>
+</sequence>
