@@ -1,32 +1,55 @@
 {
-  "id": "marathon-lb",
+  "id": "/marathon-lb",
+  "cmd": null,
+  "cpus": 1,
+  "mem": 512,
+  "disk": 0,
   "instances": 1,
-  "cpus": 0.25,
-  "mem": 1024,
-  "maintainer": "dev@wso2.com",
   "container": {
     "type": "DOCKER",
+    "volumes": [],
     "docker": {
       "image": "mesosphere/marathon-lb:v1.2.1",
+      "network": "HOST",
       "privileged": true,
-      "network": "HOST"
+      "parameters": [],
+      "forcePullImage": false
     }
   },
-  "constraints": [
-    [
-      "hostname",
-      "UNIQUE"
-    ]
+  "env": {
+    "HAPROXY_SSL_CERT": "",
+    "HAPROXY_SYSCTL_PARAMS": "net.ipv4.tcp_tw_reuse=1 net.ipv4.tcp_fin_timeout=30 net.ipv4.tcp_max_syn_backlog=10240 net.ipv4.tcp_max_tw_buckets=400000 net.ipv4.tcp_max_orphans=60000 net.core.somaxconn=10000"
+  },
+  "healthChecks": [
+    {
+      "path": "/_haproxy_health_check",
+      "protocol": "HTTP",
+      "portIndex": 0,
+      "gracePeriodSeconds": 60,
+      "intervalSeconds": 5,
+      "timeoutSeconds": 2,
+      "maxConsecutiveFailures": 2,
+      "ignoreHttp1xx": false
+    }
+  ],
+  "portDefinitions": [
+    {
+      "port": 9090,
+      "protocol": "tcp",
+      "labels": {}
+    }
   ],
   "args": [
     "sse",
-    "--marathon",
-    "http://marathon.mesos:8080",
+    "-m",
+    "http://m1.dcos:8080",
+    "--health-check",
     "--group",
     "marathon-lb"
   ],
-  "env": {
-    "PORT": "9090",
-    "PORTS": "1000"
+  "requirePorts": true,
+  "upgradeStrategy": {
+    "minimumHealthCapacity": 0.5,
+    "maximumOverCapacity": 0.2
   }
 }
