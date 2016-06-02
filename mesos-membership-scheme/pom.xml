@@ -29,7 +29,8 @@
 
     <artifactId>mesos-membership-scheme</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Mesos Membership Scheme for Carbon 4.2.0 and 4.4.x</name>
+    <name>Apache Mesos Membership Scheme</name>
+    <description>Apache Mesos membership scheme for Carbon 4.2.0 and 4.4.x</description>
     <version>1.0.0-SNAPSHOT</version>
 
     <dependencies>
