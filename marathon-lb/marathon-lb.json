@@ -1,0 +1,32 @@
+{
+  "id": "marathon-lb",
+  "instances": 1,
+  "cpus": 0.25,
+  "mem": 1024,
+  "maintainer": "dev@wso2.com",
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "mesosphere/marathon-lb:v1.2.1",
+      "privileged": true,
+      "network": "HOST"
+    }
+  },
+  "constraints": [
+    [
+      "hostname",
+      "UNIQUE"
+    ]
+  ],
+  "args": [
+    "sse",
+    "--marathon",
+    "http://marathon.mesos:8080",
+    "--group",
+    "marathon-lb"
+  ],
+  "env": {
+    "PORT": "9090",
+    "PORTS": "1000"
+  }
+}
