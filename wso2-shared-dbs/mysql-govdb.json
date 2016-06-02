@@ -1,0 +1,42 @@
+{
+  "id": "mysql-govdb",
+  "cmd": null,
+  "cpus": 1,
+  "mem": 128,
+  "disk": 0,
+  "instances": 1,
+  "container": {
+    "docker": {
+      "image": "mysql:5.5",
+      "network": "BRIDGE",
+      "portMappings": [
+        {
+          "containerPort": 3306,
+          "protocol": "tcp",
+          "name": null,
+          "labels": {
+            "VIP_0": "3306"
+          }
+        }
+      ]
+    },
+    "type": "DOCKER"
+  },
+  "env": {
+    "MYSQL_ROOT_PASSWORD": "root",
+    "MYSQL_DATABASE": "WSO2_GOV_DB",
+    "MYSQL_USER": "wso2carbon",
+    "MYSQL_PASSWORD": "wso2carbon"
+  },
+  "labels": {},
+  "healthChecks": [
+    {
+      "protocol": "TCP",
+      "portIndex": 0,
+      "gracePeriodSeconds": 300,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 20,
+      "maxConsecutiveFailures": 3
+    }
+  ]
+}
