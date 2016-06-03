@@ -23,5 +23,5 @@ marathon_endpoint="http://m1.dcos:8080/v2"
 
 source "${self_path}/../scripts/base.sh"
 
-undeploy ${marathon_endpoint} mysql-govdb
-undeploy ${marathon_endpoint} mysql-userdb
+undeploy ${marathon_endpoint} mysql-gov-db
+undeploy ${marathon_endpoint} mysql-user-db

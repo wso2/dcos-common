@@ -1,5 +1,5 @@
 {
-  "id": "mysql-userdb",
+  "id": "mysql-gov-db",
   "cmd": null,
   "cpus": 0.25,
   "mem": 128,
@@ -24,7 +24,7 @@
   },
   "env": {
     "MYSQL_ROOT_PASSWORD": "root",
-    "MYSQL_DATABASE": "WSO2_USER_DB",
+    "MYSQL_DATABASE": "WSO2_GOV_DB",
     "MYSQL_USER": "wso2carbon",
     "MYSQL_PASSWORD": "wso2carbon"
   },
