@@ -2,7 +2,7 @@
   "id": "/marathon-lb",
   "cmd": null,
   "cpus": 1,
-  "mem": 512,
+  "mem": 1024,
   "disk": 0,
   "instances": 1,
   "container": {
