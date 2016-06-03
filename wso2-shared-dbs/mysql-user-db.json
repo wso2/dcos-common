@@ -12,6 +12,7 @@
       "portMappings": [
         {
           "containerPort": 3306,
+          "servicePort": 10001,
           "protocol": "tcp",
           "name": null,
           "labels": {
@@ -28,7 +29,9 @@
     "MYSQL_USER": "wso2carbon",
     "MYSQL_PASSWORD": "wso2carbon"
   },
-  "labels": {},
+  "labels": {
+    "HAPROXY_GROUP": "marathon-lb"
+  },
   "healthChecks": [
     {
       "protocol": "TCP",
