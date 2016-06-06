@@ -21,9 +21,6 @@ set -e
 self_path=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 marathon_endpoint="http://m1.dcos:8080/v2"
-product_name="wso2esb"
-product_version="4.9.0"
 
 source "${self_path}/../scripts/base.sh"
-
 deploy ${marathon_endpoint} ${self_path}/marathon-lb.json
