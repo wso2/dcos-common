@@ -1,7 +1,7 @@
 {
   "id": "mysql-user-db",
   "cmd": null,
-  "cpus": 0.25,
+  "cpus": 0.1,
   "mem": 128,
   "disk": 0,
   "instances": 1,
