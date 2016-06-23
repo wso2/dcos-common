@@ -21,9 +21,14 @@ public class MesosConstants {
     public static final String MARATHON_APPLICATIONS = "MARATHON_APPLICATIONS";
     public static final String MARATHON_USERNAME = "MARATHON_USERNAME";
     public static final String MARATHON_PASSWORD = "MARATHON_PASSWORD";
-    public static final String ENABLE_BASIC_AUTH = "ENABLE_BASIC_AUTH";
+    public static final String ENABLE_BASIC_AUTH = "ENABLE_MARATHON_BASIC_AUTH";
     public static final String MARATHON_APP_ID = "MARATHON_APP_ID";
-    public static final String MARATHON_HOST = "HOST";
-    public static final String DEFAULT_MARATHON_ENDPOINT = "http://" + System.getenv(MARATHON_HOST) + ":8080";
-    public static final String APPLICATION_JSON = "application/json";
+    public static final String MESOS_DNS_ENDPOINT = "MESOS_DNS_ENDPOINT";
+    public static final String MESOS_MEMBER_DISCOVERY_SCHEME = "MESOS_MEMBER_DISCOVERY_SCHEME";
+    public static final String MESOS_DNS_DISCOVERY_SCHEME = "MesosDNS";
+    public static final String MESOS_MARATHON_DISCOVERY_SCHEME = "Marathon";
+    public static final String DEFAULT_MARATHON_ENDPOINT = "http://marathon.mesos:8080";
+    public static final String DEFAULT_MESOS_DNS_ENDPOINT = "http://marathon.mesos:8123";
+    public static final String DNS_UPDATE_TIMEOUT = "DNS_UPDATE_TIMEOUT";
+    public static final String DEFAULT_DNS_UPDATE_TIMEOUT = "30"; // in seconds
 }
