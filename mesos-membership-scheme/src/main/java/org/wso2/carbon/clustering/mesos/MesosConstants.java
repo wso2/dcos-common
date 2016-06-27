@@ -30,5 +30,6 @@ public class MesosConstants {
     public static final String DEFAULT_MARATHON_ENDPOINT = "http://marathon.mesos:8080";
     public static final String DEFAULT_MESOS_DNS_ENDPOINT = "http://marathon.mesos:8123";
     public static final String DNS_UPDATE_TIMEOUT = "DNS_UPDATE_TIMEOUT";
-    public static final String DEFAULT_DNS_UPDATE_TIMEOUT = "30"; // in seconds
+    public static final String DEFAULT_DNS_UPDATE_TIMEOUT = "10"; // in seconds
+    public static final int DNS_RETRY_INTERVAL = 5; // in seconds
 }

@@ -170,9 +170,9 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
                     StringUtils.isEmpty(mesosDNSSRVRecords.get(0).getIp()) ||
                     StringUtils.isEmpty(mesosDNSSRVRecords.get(0).getPort())) {
                 log.info(String.format("DNS records have not been updated for Mesos service [Name] %s. " +
-                        "Retrying in 5s...", mesosServiceName));
+                        "Retrying in %ds...", mesosServiceName, DNS_RETRY_INTERVAL));
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(DNS_RETRY_INTERVAL * 1000);
                 } catch (InterruptedException e) {
                     log.error(e);
                 }
@@ -267,7 +267,8 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
 
         String localAppId = getParameterValue(MARATHON_APP_ID, "");
         if (StringUtils.isEmpty(localAppId)) {
-            throw new IllegalArgumentException("MARATHON_APP_ID property was not found in environment variables");
+            throw new IllegalArgumentException(String.format("%s property was not found in environment variables",
+                    MARATHON_APP_ID));
         }
         // MARATHON_APP_ID environment variable passed to instance contains forward-slash prefix
         if (localAppId.startsWith("/")) {
