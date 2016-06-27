@@ -9,7 +9,7 @@
     "type": "DOCKER",
     "volumes": [],
     "docker": {
-      "image": "mesosphere/marathon-lb:v1.2.1",
+      "image": "mesosphere/marathon-lb:v1.3.0",
       "network": "HOST",
       "privileged": true,
       "parameters": [],
@@ -35,8 +35,7 @@
   "portDefinitions": [
     {
       "port": 9090,
-      "protocol": "tcp",
-      "labels": {}
+      "protocol": "tcp"
     }
   ],
   "args": [
