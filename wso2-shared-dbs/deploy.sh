@@ -18,10 +18,15 @@
 # ------------------------------------------------------------------------
 
 set -e
-self_path=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-marathon_endpoint="http://m1.dcos:8080/v2"
+self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+mesos_artifacts_home="${self_path}/../.."
+source "${mesos_artifacts_home}/common/scripts/base.sh"
+echo "Deploying WSO2 shared databases..."
 
-source "${self_path}/../scripts/base.sh"
-
-deploy ${marathon_endpoint} ${self_path}/mysql-gov-db.json
-deploy ${marathon_endpoint} ${self_path}/mysql-user-db.json
+deploy_gov_db="deploy mysql-gov-db ${self_path}/mysql-gov-db.json"
+deploy_user_db="deploy mysql-user-db ${self_path}/mysql-user-db.json"
+if ! ($deploy_gov_db && $deploy_user_db); then
+  echoError "Failed to deploy WSO2 shared databases"
+  exit 1
+fi
+echoSuccess "Successfully deployed WSO2 shared databases"

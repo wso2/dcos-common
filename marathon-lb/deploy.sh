@@ -18,9 +18,13 @@
 # ------------------------------------------------------------------------
 
 set -e
-self_path=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+mesos_artifacts_home="${self_path}/../.."
+source "${mesos_artifacts_home}/common/scripts/base.sh"
+marathon_lb_port=9090
 
-marathon_endpoint="http://m1.dcos:8080/v2"
-
-source "${self_path}/../scripts/base.sh"
-deploy ${marathon_endpoint} ${self_path}/marathon-lb.json
+if ! deploy 'marathon-lb' "${self_path}/marathon-lb.json"; then
+  echoError "Failed to deploy marathon-lb"
+  exit 1
+fi
+waitUntilServiceIsActive 'marathon-lb' $marathon_lb_port

@@ -18,10 +18,9 @@
 # ------------------------------------------------------------------------
 
 set -e
-self_path=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-marathon_endpoint="http://m1.dcos:8080/v2"
+self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+mesos_artifacts_home="${self_path}/../.."
+source "${mesos_artifacts_home}/common/scripts/base.sh"
 
-source "${self_path}/../scripts/base.sh"
-
-undeploy ${marathon_endpoint} mysql-gov-db
-undeploy ${marathon_endpoint} mysql-user-db
+undeploy mysql-gov-db
+undeploy mysql-user-db
