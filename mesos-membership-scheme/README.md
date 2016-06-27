@@ -24,7 +24,7 @@ get connected all the other members in the cluster. In addition once a new membe
 
 3. Update axis2.xml with the following configuration:
 
-```
+   ```
    <clustering class="org.wso2.carbon.core.clustering.hazelcast.HazelcastClusteringAgent" enable="true">
       <parameter name="membershipSchemeClassName">org.wso2.carbon.clustering.mesos.MesosMembershipScheme</parameter>
       <parameter name="membershipScheme">mesos</parameter>
@@ -52,7 +52,7 @@ get connected all the other members in the cluster. In addition once a new membe
       !-- Password of secured Marathon REST API -->
       <parameter name="MARATHON_PASSWORD">password</parameter>
    </clustering>
-```
+   ```
 
 
 ### Build Docker images
@@ -60,16 +60,16 @@ get connected all the other members in the cluster. In addition once a new membe
 Dockerfiles and scripts are provided to build the Docker images with minimum overhead.
 
 1. Clone [wso2/dockerfiles](https://github.com/wso2/dockerfiles) repo and build base Docker images for WSO2 products.
-2. Goto modules/mesos-membership-scheme/dockerfiles/<product_name>/
+2. Goto modules/mesos-membership-scheme/dockerfiles/< product_name >/
 3. Run the following command
 
-```
-./deploy.sh -v <product_version> -b -E
-```
-
+    ```
+    ./deploy.sh -v <product_version> -b -E
+    ```
 
 4. Deploy the Marathon application
-```
-./deploy.sh -v 4.9.0 -d
-```
+    
+    ```
+    ./deploy.sh -v 4.9.0 -d
+    ```
 
