@@ -21,9 +21,9 @@ export product_name=${PWD##*/}
 
 function echoDim() {
   if [ -z "$2" ]; then
-      echo $'\e[2m'"${1}"$'\e[0m'
+    echo $'\e[2m'"${1}"$'\e[0m'
   else
-      echo -n $'\e[2m'"${1}"$'\e[0m'
+    echo -n $'\e[2m'"${1}"$'\e[0m'
   fi
 }
 
@@ -100,9 +100,9 @@ function undeploy() {
 function waitUntilServiceIsActive() {
   marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
   echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
-  while ! nc -w3 $marathon_lb_host_ip $2 >/dev/null; do
-    echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
+  while ! [ $($mesos_artifacts_home/common/scripts/check-service.py $marathon_lb_host_ip $2) -eq 0 ] ; do
     sleep 10s
+    echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
     marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
   done
   echoSuccess "Successfully started ${1}"
@@ -138,4 +138,26 @@ function showUsageAndExitDefault() {
 
   echoBold "Ex: ./deploy.sh"
   exit 1
+}
+
+function deploy_common_service()
+{
+  if ! bash ${mesos_artifacts_home}/common/${1}/deploy.sh; then
+    echoError "Non-zero exit code returned when deploying ${1}"
+    exit 1
+  fi
+}
+
+function deploy_wso2_service()
+{
+  if ! deploy ${1} $self_path/${1}.json; then
+    echoError "Non-zero exit code returned when deploying ${1}"
+    exit 1
+  fi
+  waitUntilServiceIsActive ${1} ${2}
+}
+
+function deploy_common_services() {
+  deploy_common_service  'marathon-lb'
+  deploy_common_service 'wso2-shared-dbs'
 }

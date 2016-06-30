@@ -21,12 +21,19 @@ set -e
 self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 mesos_artifacts_home="${self_path}/../.."
 source "${mesos_artifacts_home}/common/scripts/base.sh"
+mysql_gov_db_service_port=10000
+mysql_user_db_service_port=10001
+
 echo "Deploying WSO2 shared databases..."
 
 deploy_gov_db="deploy mysql-gov-db ${self_path}/mysql-gov-db.json"
 deploy_user_db="deploy mysql-user-db ${self_path}/mysql-user-db.json"
+
 if ! ($deploy_gov_db && $deploy_user_db); then
   echoError "Failed to deploy WSO2 shared databases"
   exit 1
 fi
 echoSuccess "Successfully deployed WSO2 shared databases"
+
+waitUntilServiceIsActive 'mysql-gov-db' $mysql_gov_db_service_port
+waitUntilServiceIsActive 'mysql-user-db' $mysql_user_db_service_port
