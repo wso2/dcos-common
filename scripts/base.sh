@@ -99,10 +99,9 @@ function undeploy() {
 # $2 - service port
 function waitUntilServiceIsActive() {
   marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
-  echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
-  while ! [ $($mesos_artifacts_home/common/scripts/check-service.py $marathon_lb_host_ip $2) -eq 0 ] ; do
-    sleep 10s
+  while ! python $mesos_artifacts_home/common/scripts/check-service.py $marathon_lb_host_ip $2; do
     echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
+    sleep 10s
     marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
   done
   echoSuccess "Successfully started ${1}"
