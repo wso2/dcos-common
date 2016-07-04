@@ -89,22 +89,27 @@ function undeploy() {
   echoBold "Removing Marathon application: ${1}..."
   if ! dcos marathon app remove $1; then
     echoError "Failed to undeploy ${1}. Non-zero exit code returned from DCOS CLI"
+    return 1
   fi
   echoSuccess "Successfully undeployed ${1}"
   return 0
 }
 
-# Check whether given service port is open via marathon-lb
-# $1 - Marathon application ID
-# $2 - service port
+# Check whether given service port is open
+# $1 -Marathon application id
+# $2 -service port
 function waitUntilServiceIsActive() {
-  marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
-  while ! python $mesos_artifacts_home/common/scripts/check-service.py $marathon_lb_host_ip $2; do
-    echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
+  while ! dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1; do
+    echoBold "Waiting to get host ip for ${1}"
+    sleep 5s
+  done
+  host_ip=$(dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1)
+  while ! python $mesos_artifacts_home/common/scripts/check-service.py $host_ip $2; do
+    echoBold "Waiting for ${1} to launch on ${host_ip}:${2}..."
     sleep 10s
-    marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
   done
   echoSuccess "Successfully started ${1}"
+  return 0
 }
 
 function showUsageAndExitDistributed() {
@@ -143,18 +148,25 @@ function deploy_common_service()
 {
   if ! bash ${mesos_artifacts_home}/common/${1}/deploy.sh; then
     echoError "Non-zero exit code returned when deploying ${1}"
+    return 1
   fi
+  return 0
 }
 
 function deploy_service()
 {
   if ! deploy ${1} $self_path/${1}.json; then
     echoError "Non-zero exit code returned when deploying ${1}"
+    exit 1
   fi
   waitUntilServiceIsActive ${1} ${2}
 }
 
 function deploy_common_services() {
-  deploy_common_service 'marathon-lb'
-  deploy_common_service 'wso2-shared-dbs'
+  if ! deploy_common_service 'marathon-lb'; then
+    exit 1
+  fi
+  if ! deploy_common_service 'wso2-shared-dbs'; then
+    exit 1
+  fi
 }

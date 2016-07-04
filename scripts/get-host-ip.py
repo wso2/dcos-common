@@ -18,22 +18,28 @@
 # ------------------------------------------------------------------------
 import sys, json;
 
+
 def main():
+    if len(sys.argv) != 2:
+        print "Could not get application id"
+        sys.exit(1)
+    app_id = str.strip(sys.argv[1])
     data = json.load(sys.stdin)
     if (data is None or 'tasks' not in data):
-        print "Error! Marathon application for marathon-lb is not found"
+        print "Error! Marathon application for", app_id, " is not found"
         sys.exit(1)
 
     if (len(data['tasks']) == 0):
-        print "Error! No tasks found for marathon-lb"
+        print "Error! No tasks found for", app_id
         sys.exit(1)
 
     if ('host' not in data['tasks'][0]):
-        print "Host is not found for marathon-lb task"
+        print "Host is not found for", app_id, " task"
         sys.exit(1)
 
     print data['tasks'][0]['host']
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
