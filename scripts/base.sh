@@ -159,7 +159,9 @@ function deploy_service()
     echoError "Non-zero exit code returned when deploying ${1}"
     exit 1
   fi
-  waitUntilServiceIsActive ${1} ${2}
+  if ! waitUntilServiceIsActive ${1} ${2}; then
+    exit 1
+  fi
 }
 
 function deploy_common_services() {
