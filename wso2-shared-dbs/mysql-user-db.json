@@ -29,9 +29,6 @@
     "MYSQL_USER": "wso2carbon",
     "MYSQL_PASSWORD": "wso2carbon"
   },
-  "labels": {
-    "HAPROXY_GROUP": "marathon-lb"
-  },
   "healthChecks": [
     {
       "protocol": "TCP",
