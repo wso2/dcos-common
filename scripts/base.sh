@@ -146,7 +146,7 @@ function deploy_common_service()
   fi
 }
 
-function deploy_wso2_service()
+function deploy_service()
 {
   if ! deploy ${1} $self_path/${1}.json; then
     echoError "Non-zero exit code returned when deploying ${1}"
