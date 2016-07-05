@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env python
 # ------------------------------------------------------------------------
 #
 # Copyright 2016 WSO2, Inc. (http://wso2.com)
@@ -16,24 +16,27 @@
 # limitations under the License
 
 # ------------------------------------------------------------------------
+import socket;
+import sys;
 
-set -e
-self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-mesos_artifacts_home="${self_path}/../.."
-source "${mesos_artifacts_home}/common/scripts/base.sh"
-mysql_gov_db_service_port=10000
-mysql_user_db_service_port=10001
 
-echo "Deploying WSO2 shared databases..."
+def main():
+    if len(sys.argv) != 3:
+        print "Invalid arguments", sys.argv
+        sys.exit(1)
 
-deploy_gov_db="deploy mysql-gov-db ${self_path}/mysql-gov-db.json"
-deploy_user_db="deploy mysql-user-db ${self_path}/mysql-user-db.json"
+    host = str.strip(sys.argv[1])
+    port = str.strip(sys.argv[2])
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = s.connect_ex((host, int(port)))
+        s.close()
+        sys.exit(result)
+    except Exception, e:
+        print e
+        s.close()
+        sys.exit(1)
 
-if ! ($deploy_gov_db && $deploy_user_db); then
-  echoError "Failed to deploy WSO2 shared databases"
-  exit 1
-fi
-echoSuccess "Successfully deployed WSO2 shared databases"
 
-waitUntilServiceIsActive 'mysql-gov-db' $mysql_gov_db_service_port
-waitUntilServiceIsActive 'mysql-user-db' $mysql_user_db_service_port
+if __name__ == '__main__':
+    main()

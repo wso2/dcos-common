@@ -21,9 +21,9 @@ export product_name=${PWD##*/}
 
 function echoDim() {
   if [ -z "$2" ]; then
-      echo $'\e[2m'"${1}"$'\e[0m'
+    echo $'\e[2m'"${1}"$'\e[0m'
   else
-      echo -n $'\e[2m'"${1}"$'\e[0m'
+    echo -n $'\e[2m'"${1}"$'\e[0m'
   fi
 }
 
@@ -89,23 +89,35 @@ function undeploy() {
   echoBold "Removing Marathon application: ${1}..."
   if ! dcos marathon app remove $1; then
     echoError "Failed to undeploy ${1}. Non-zero exit code returned from DCOS CLI"
+    return 1
   fi
   echoSuccess "Successfully undeployed ${1}"
   return 0
 }
 
-# Check whether given service port is open via marathon-lb
-# $1 - Marathon application ID
-# $2 - service port
+# Check whether given service port is open
+# $1 -Marathon application id
+# $2 -service port
 function waitUntilServiceIsActive() {
-  marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
-  echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
-  while ! nc -w3 $marathon_lb_host_ip $2 >/dev/null; do
-    echoBold "Waiting for ${1} to launch on ${marathon_lb_host_ip}:${2}..."
-    sleep 10s
-    marathon_lb_host_ip=$(dcos marathon app show marathon-lb | $mesos_artifacts_home/common/scripts/get-marathon-lb-host.py)
+  retry_count=30
+  count=0
+  while (! dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1 && [ "$count" -lt "$retry_count" ] ); do
+    echoBold "Waiting to get host ip for ${1}"
+    count=$((count + 1))
+    sleep 1s
   done
-  echoSuccess "Successfully started ${1}"
+  host_ip=$(dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1)
+  count=0
+  while (! python $mesos_artifacts_home/common/scripts/check-service.py $host_ip $2 && [ "$count" -lt "$retry_count" ] ) ; do
+    echoBold "Waiting for ${1} to launch on ${host_ip}:${2}..."
+    count=$((count + 1))
+    sleep 5s
+  done
+  if [ "$count" -lt "$retry_count" ]; then
+    echoSuccess "Successfully started ${1}"
+    return 0
+  fi
+  return 1
 }
 
 function showUsageAndExitDistributed() {
@@ -138,4 +150,29 @@ function showUsageAndExitDefault() {
 
   echoBold "Ex: ./deploy.sh"
   exit 1
+}
+
+function deploy_common_service()
+{
+  if ! bash ${mesos_artifacts_home}/common/${1}/deploy.sh; then
+    echoError "Aborting deployment"
+    exit 1
+  fi
+}
+
+function deploy_service()
+{
+  if ! deploy ${1} $self_path/${1}.json; then
+    echoError "Aborting deployment"
+    exit 1
+  fi
+  if ! waitUntilServiceIsActive ${1} ${2}; then
+    echoError "Could not launch ${1}. Aborting deployment"
+    exit 1
+  fi
+}
+
+function deploy_common_services() {
+  deploy_common_service 'marathon-lb'
+  deploy_common_service 'wso2-shared-dbs'
 }
