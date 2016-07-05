@@ -148,9 +148,8 @@ function deploy_common_service()
 {
   if ! bash ${mesos_artifacts_home}/common/${1}/deploy.sh; then
     echoError "Non-zero exit code returned when deploying ${1}"
-    return 1
+    exit 1
   fi
-  return 0
 }
 
 function deploy_service()
@@ -165,10 +164,6 @@ function deploy_service()
 }
 
 function deploy_common_services() {
-  if ! deploy_common_service 'marathon-lb'; then
-    exit 1
-  fi
-  if ! deploy_common_service 'wso2-shared-dbs'; then
-    exit 1
-  fi
+  deploy_common_service 'marathon-lb'
+  deploy_common_service 'wso2-shared-dbs'
 }
