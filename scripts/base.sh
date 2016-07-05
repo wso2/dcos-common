@@ -99,19 +99,19 @@ function undeploy() {
 # $1 -Marathon application id
 # $2 -service port
 function waitUntilServiceIsActive() {
-  retry_count=12
+  retry_count=30
   count=0
   while (! dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1 && [ "$count" -lt "$retry_count" ] ); do
     echoBold "Waiting to get host ip for ${1}"
     count=$((count + 1))
-    sleep 5s
+    sleep 1s
   done
   host_ip=$(dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1)
   count=0
   while (! python $mesos_artifacts_home/common/scripts/check-service.py $host_ip $2 && [ "$count" -lt "$retry_count" ] ) ; do
     echoBold "Waiting for ${1} to launch on ${host_ip}:${2}..."
     count=$((count + 1))
-    sleep 10s
+    sleep 5s
   done
   if [ "$count" -lt "$retry_count" ]; then
     echoSuccess "Successfully started ${1}"
