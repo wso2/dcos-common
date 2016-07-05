@@ -99,17 +99,25 @@ function undeploy() {
 # $1 -Marathon application id
 # $2 -service port
 function waitUntilServiceIsActive() {
-  while ! dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1; do
+  retry_count=12
+  count=0
+  while (! dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1 && [ "$count" -lt "$retry_count" ] ); do
     echoBold "Waiting to get host ip for ${1}"
+    count=$((count + 1))
     sleep 5s
   done
   host_ip=$(dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1)
-  while ! python $mesos_artifacts_home/common/scripts/check-service.py $host_ip $2; do
+  count=0
+  while (! python $mesos_artifacts_home/common/scripts/check-service.py $host_ip $2 && [ "$count" -lt "$retry_count" ] ) ; do
     echoBold "Waiting for ${1} to launch on ${host_ip}:${2}..."
+    count=$((count + 1))
     sleep 10s
   done
-  echoSuccess "Successfully started ${1}"
-  return 0
+  if [ "$count" -lt "$retry_count" ]; then
+    echoSuccess "Successfully started ${1}"
+    return 0
+  fi
+  return 1
 }
 
 function showUsageAndExitDistributed() {
@@ -147,7 +155,7 @@ function showUsageAndExitDefault() {
 function deploy_common_service()
 {
   if ! bash ${mesos_artifacts_home}/common/${1}/deploy.sh; then
-    echoError "Non-zero exit code returned when deploying ${1}"
+    echoError "Aborting deployment"
     exit 1
   fi
 }
@@ -155,10 +163,11 @@ function deploy_common_service()
 function deploy_service()
 {
   if ! deploy ${1} $self_path/${1}.json; then
-    echoError "Non-zero exit code returned when deploying ${1}"
+    echoError "Aborting deployment"
     exit 1
   fi
   if ! waitUntilServiceIsActive ${1} ${2}; then
+    echoError "Could not launch ${1}. Aborting deployment"
     exit 1
   fi
 }

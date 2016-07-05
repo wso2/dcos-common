@@ -21,12 +21,16 @@ import sys, json;
 
 def main():
     if len(sys.argv) != 2:
-        print "Could not get application id"
+        print "Invalid Arguments", sys.argv
         sys.exit(1)
     app_id = str.strip(sys.argv[1])
-    data = json.load(sys.stdin)
+    try:
+        data = json.load(sys.stdin)
+    except ValueError, e:
+        print e
+        sys.exit(1)
     if (data is None or 'tasks' not in data):
-        print "Error! Marathon application for", app_id, " is not found"
+        print "Invalid json input"
         sys.exit(1)
 
     if (len(data['tasks']) == 0):
