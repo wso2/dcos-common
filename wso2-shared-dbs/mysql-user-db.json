@@ -14,7 +14,7 @@
           "containerPort": 3306,
           "hostPort": 10001,
           "protocol": "tcp",
-          "name": null,
+          "name": "server-port",
           "labels": {
             "VIP_0": "3306"
           }
