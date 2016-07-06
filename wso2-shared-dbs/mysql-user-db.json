@@ -14,7 +14,7 @@
           "containerPort": 3306,
           "hostPort": 10001,
           "protocol": "tcp",
-          "name": "server-port",
+          "name": "mysql",
           "labels": {
             "VIP_0": "3306"
           }
