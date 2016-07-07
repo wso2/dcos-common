@@ -21,8 +21,8 @@ set -e
 self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 mesos_artifacts_home="${self_path}/../.."
 source "${mesos_artifacts_home}/common/scripts/base.sh"
-mysql_gov_db_service_port=10000
-mysql_user_db_service_port=10001
+mysql_gov_db_host_port=10000
+mysql_user_db_host_port=10001
 
 echo "Deploying WSO2 shared databases..."
 
@@ -35,5 +35,5 @@ if ! ($deploy_gov_db && $deploy_user_db); then
 fi
 echoSuccess "Successfully deployed WSO2 shared databases"
 
-waitUntilServiceIsActive 'mysql-gov-db' $mysql_gov_db_service_port
-waitUntilServiceIsActive 'mysql-user-db' $mysql_user_db_service_port
+waitUntilServiceIsActive 'mysql-gov-db' $mysql_gov_db_host_port 'mysql-gov-db'
+waitUntilServiceIsActive 'mysql-user-db' $mysql_user_db_host_port 'mysql-user-db'

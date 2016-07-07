@@ -97,7 +97,8 @@ function undeploy() {
 
 # Check whether given service port is open
 # $1 -Marathon application id
-# $2 -service port
+# $2 -Port
+# $3 -Port Type
 function waitUntilServiceIsActive() {
   retry_count=30
   count=0
@@ -106,7 +107,7 @@ function waitUntilServiceIsActive() {
     count=$((count + 1))
     sleep 1s
   done
-  host_ip=$(dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1)
+  host_ip=$(dcos marathon app show $3 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $3)
   count=0
   while (! python $mesos_artifacts_home/common/scripts/check-service.py $host_ip $2 && [ "$count" -lt "$retry_count" ] ) ; do
     echoBold "Waiting for ${1} to launch on ${host_ip}:${2}..."
@@ -166,7 +167,7 @@ function deploy_service()
     echoError "Aborting deployment"
     exit 1
   fi
-  if ! waitUntilServiceIsActive ${1} ${2}; then
+  if ! waitUntilServiceIsActive ${1} ${2} ${3}; then
     echoError "Could not launch ${1}. Aborting deployment"
     exit 1
   fi

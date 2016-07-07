@@ -27,4 +27,4 @@ if ! deploy 'marathon-lb' "${self_path}/marathon-lb.json"; then
   echoError "Failed to deploy marathon-lb"
   exit 1
 fi
-waitUntilServiceIsActive 'marathon-lb' $marathon_lb_port
+waitUntilServiceIsActive 'marathon-lb' $marathon_lb_port 'marathon-lb'
