@@ -173,3 +173,7 @@ function deploy_common_services() {
   deploy_common_service 'marathon-lb'
   deploy_common_service 'wso2-shared-dbs'
 }
+
+function getMesosNodes(){
+    dcos node | awk '{if (NR!=1) print $2}'
+}
