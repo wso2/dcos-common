@@ -33,7 +33,6 @@ if ! ($deploy_gov_db && $deploy_user_db); then
   echoError "Failed to deploy WSO2 shared databases"
   exit 1
 fi
+waitUntilServiceIsActive 'mysql-gov-db'
+waitUntilServiceIsActive 'mysql-user-db'
 echoSuccess "Successfully deployed WSO2 shared databases"
-
-waitUntilServiceIsActive 'mysql-gov-db' $mysql_gov_db_host_port 'mysql-gov-db'
-waitUntilServiceIsActive 'mysql-user-db' $mysql_user_db_host_port 'mysql-user-db'

@@ -16,27 +16,23 @@
 # limitations under the License
 
 # ------------------------------------------------------------------------
-import socket;
-import sys;
-
+import sys, json;
 
 def main():
-    if len(sys.argv) != 3:
-        print "Invalid arguments", sys.argv
-        sys.exit(1)
-
-    host = str.strip(sys.argv[1])
-    port = str.strip(sys.argv[2])
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = s.connect_ex((host, int(port)))
-        s.close()
-        sys.exit(result)
-    except Exception, e:
+        data = json.load(sys.stdin)
+        if (data is None or 'tasksUnhealthy' not in data or
+            'tasksHealthy' not in data or 'tasksStaged' not in data):
+            print "Invalid json input: ", data
+            sys.exit(1)
+        tasksHealthy = int(data['tasksHealthy'])
+        tasksUnhealthy = int(data['tasksUnhealthy'])
+        tasksStaged = int(data['tasksStaged'])
+        if (tasksHealthy == 0 or tasksUnhealthy != 0 or tasksStaged != 0):
+            sys.exit(1)
+    except Exception as e:
         print e
-        s.close()
         sys.exit(1)
-
 
 if __name__ == '__main__':
     main()

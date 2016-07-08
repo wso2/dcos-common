@@ -31,10 +31,11 @@
   },
   "healthChecks": [
     {
-      "protocol": "TCP",
+      "protocol": "COMMAND",
+      "command": { "value": "mysqladmin -u $MYSQL_USER -p$MYSQL_PASSWORD status" },
       "portIndex": 0,
       "gracePeriodSeconds": 300,
-      "intervalSeconds": 60,
+      "intervalSeconds": 20,
       "timeoutSeconds": 20,
       "maxConsecutiveFailures": 3
     }

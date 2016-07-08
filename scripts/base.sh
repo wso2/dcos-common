@@ -97,28 +97,25 @@ function undeploy() {
 
 # Check whether given service port is open
 # $1 -Marathon application id
-# $2 -Port
-# $3 -Port Type
 function waitUntilServiceIsActive() {
-  retry_count=30
+  # read from env variables or default to 50
+  RETRY_COUNT=${RETRY_COUNT:-50}
   count=0
-  while (! dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $1 && [ "$count" -lt "$retry_count" ] ); do
-    echoBold "Waiting to get host ip for ${1}"
-    count=$((count + 1))
-    sleep 1s
-  done
-  host_ip=$(dcos marathon app show $3 | python $mesos_artifacts_home/common/scripts/get-host-ip.py $3)
-  count=0
-  while (! python $mesos_artifacts_home/common/scripts/check-service.py $host_ip $2 && [ "$count" -lt "$retry_count" ] ) ; do
-    echoBold "Waiting for ${1} to launch on ${host_ip}:${2}..."
+
+  while (! dcos marathon app show $1 | python $mesos_artifacts_home/common/scripts/check-service.py && [ "$count" -lt "$RETRY_COUNT" ])
+  do
+    echoBold "Waiting for tasks in ${1} to become healthy..."
     count=$((count + 1))
     sleep 5s
   done
-  if [ "$count" -lt "$retry_count" ]; then
-    echoSuccess "Successfully started ${1}"
+
+  if [ "$count" -lt "$RETRY_COUNT" ]; then
+    echoSuccess "Tasks in ${1} are healthy"
     return 0
+  else
+    echoError "Tasks in ${1} did not become healthy in timeout count of ${RETRY_COUNT}"
+    return 1
   fi
-  return 1
 }
 
 function showUsageAndExitDistributed() {
@@ -153,21 +150,20 @@ function showUsageAndExitDefault() {
   exit 1
 }
 
-function deploy_common_service()
-{
+function deploy_common_service() {
   if ! bash ${mesos_artifacts_home}/common/${1}/deploy.sh; then
     echoError "Aborting deployment"
     exit 1
   fi
 }
 
-function deploy_service()
-{
+function deploy_service() {
   if ! deploy ${1} $self_path/${1}.json; then
     echoError "Aborting deployment"
     exit 1
   fi
-  if ! waitUntilServiceIsActive ${1} ${2} ${3}; then
+
+  if ! waitUntilServiceIsActive ${1}; then
     echoError "Could not launch ${1}. Aborting deployment"
     exit 1
   fi

@@ -18,10 +18,9 @@
 # ------------------------------------------------------------------------
 import sys, json;
 
-
 def main():
     if len(sys.argv) != 2:
-        print "Invalid Arguments", sys.argv
+        print "Invalid Arguments: ", sys.argv
         sys.exit(1)
     app_id = str.strip(sys.argv[1])
     try:
@@ -40,10 +39,7 @@ def main():
     if ('host' not in data['tasks'][0]):
         print "Host is not found for", app_id, " task"
         sys.exit(1)
-
     print data['tasks'][0]['host']
-    sys.exit(0)
-
 
 if __name__ == "__main__":
     main()
