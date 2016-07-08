@@ -1,7 +1,6 @@
 {
   "id": "/marathon-lb",
-  "cmd": null,
-  "cpus": 0.2,
+  "cpus": 0.5,
   "mem": 256,
   "disk": 0,
   "instances": 1,
@@ -10,8 +9,7 @@
     "docker": {
       "image": "mesosphere/marathon-lb:v1.3.0",
       "network": "HOST",
-      "privileged": true,
-      "forcePullImage": false
+      "privileged": true
     }
   },
   "env": {
@@ -39,7 +37,7 @@
   "args": [
     "sse",
     "-m",
-    "http://m1.dcos:8080",
+    "http://master.mesos:8080",
     "--health-check",
     "--group",
     "marathon-lb"
