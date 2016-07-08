@@ -110,7 +110,7 @@ function waitUntilServiceIsActive() {
   done
 
   if [ "$count" -lt "$RETRY_COUNT" ]; then
-    echoSuccess "Tasks in ${1} are healthy"
+    echoSuccess "All tasks in ${1} are healthy"
     return 0
   else
     echoError "Tasks in ${1} did not become healthy in timeout count of ${RETRY_COUNT}"
@@ -157,6 +157,9 @@ function deploy_common_service() {
   fi
 }
 
+# Deploy Marathon application via DCOS CLI and wait until it becomes healthy
+# $1 - Marathon application id
+# $2 - [optional] service port or host port
 function deploy_service() {
   if ! deploy ${1} $self_path/${1}.json; then
     echoError "Aborting deployment"
@@ -167,6 +170,11 @@ function deploy_service() {
     echoError "Could not launch ${1}. Aborting deployment"
     exit 1
   fi
+
+  # Set marathon-lb host IP so that service can be accessed via service port
+  marathonlb_host_ip=$(dcos marathon app show 'marathon-lb' | python $mesos_artifacts_home/common/scripts/get-host-ip.py 'marathon-lb')
+
+  #TODO: check whether service is accessible via marathon-lb
 }
 
 function deploy_common_services() {
