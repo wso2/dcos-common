@@ -1,11 +1,12 @@
 {
   "id": "mysql-user-db",
   "cmd": null,
-  "cpus": 0.1,
+  "cpus": 0.2,
   "mem": 128,
   "disk": 0,
   "instances": 1,
   "container": {
+    "type": "DOCKER",
     "docker": {
       "image": "mysql:5.5",
       "network": "BRIDGE",
@@ -20,8 +21,7 @@
           }
         }
       ]
-    },
-    "type": "DOCKER"
+    }
   },
   "env": {
     "MYSQL_ROOT_PASSWORD": "root",
@@ -33,9 +33,8 @@
     {
       "protocol": "COMMAND",
       "command": { "value": "mysqladmin -u $MYSQL_USER -p$MYSQL_PASSWORD status" },
-      "portIndex": 0,
       "gracePeriodSeconds": 300,
-      "intervalSeconds": 60,
+      "intervalSeconds": 20,
       "timeoutSeconds": 20,
       "maxConsecutiveFailures": 3
     }
