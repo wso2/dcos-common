@@ -1,18 +1,16 @@
 {
   "id": "/marathon-lb",
   "cmd": null,
-  "cpus": 0.1,
+  "cpus": 0.2,
   "mem": 256,
   "disk": 0,
   "instances": 1,
   "container": {
     "type": "DOCKER",
-    "volumes": [],
     "docker": {
       "image": "mesosphere/marathon-lb:v1.3.0",
       "network": "HOST",
       "privileged": true,
-      "parameters": [],
       "forcePullImage": false
     }
   },
