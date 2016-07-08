@@ -1,6 +1,5 @@
 {
   "id": "mysql-gov-db",
-  "cmd": null,
   "cpus": 0.2,
   "mem": 128,
   "disk": 0,
