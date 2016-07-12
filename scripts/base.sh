@@ -113,7 +113,7 @@ function waitUntilServiceIsActive() {
     echoSuccess "All tasks in ${1} are healthy"
     return 0
   else
-    echoError "Tasks in ${1} did not become healthy in timeout count of ${RETRY_COUNT}"
+    echoError "Tasks in ${1} did not become healthy within timeout count of ${RETRY_COUNT}"
     return 1
   fi
 }
