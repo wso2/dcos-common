@@ -2,7 +2,6 @@
   "id": "mysql-gov-db",
   "cpus": 0.2,
   "mem": 128,
-  "disk": 0,
   "instances": 1,
   "container": {
     "type": "DOCKER",
@@ -11,13 +10,10 @@
       "network": "BRIDGE",
       "portMappings": [
         {
+          "name": "mysql",
           "containerPort": 3306,
           "hostPort": 10000,
-          "protocol": "tcp",
-          "name": "mysql",
-          "labels": {
-            "VIP_0": "3306"
-          }
+          "protocol": "tcp"
         }
       ]
     }
@@ -31,7 +27,9 @@
   "healthChecks": [
     {
       "protocol": "COMMAND",
-      "command": { "value": "mysqladmin -u $MYSQL_USER -p$MYSQL_PASSWORD status" },
+      "command": {
+        "value": "mysqladmin -u $MYSQL_USER -p$MYSQL_PASSWORD status"
+      },
       "gracePeriodSeconds": 300,
       "intervalSeconds": 20,
       "timeoutSeconds": 20,
