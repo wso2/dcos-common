@@ -1,0 +1,35 @@
+{
+  "id": "svn",
+  "cpus": 0.5,
+  "mem": 256,
+  "instances": 1,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "svn:1.0.0",
+      "network": "BRIDGE",
+      "portMappings": [
+        {
+          "name": "svn",
+          "containerPort": 80,
+          "servicePort": 10005,
+          "protocol": "tcp"
+        }
+      ]
+    }
+  },
+  "env": {
+    "USERNAME": "wso2carbon",
+    "PASSWORD": "wso2carbon",
+    "REPO_LIST": "ESB,BPS"
+  },
+  "labels": {
+  "HAPROXY_0_GROUP": "marathon-lb"
+  },
+  "healthChecks": [
+    {
+      "portIndex": 0,
+      "protocol": "TCP"
+    }
+  ]
+}
