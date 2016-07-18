@@ -7,13 +7,13 @@
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "mesosphere/marathon-lb:v1.3.0",
+      "image": "wso2/marathon-lb:v1.3.0",
       "network": "HOST",
       "privileged": true
     }
   },
   "env": {
-    "HAPROXY_SSL_CERT": "",
+    "HAPROXY_SSL_CERT": "/etc/ssl/wso2demo.pem",
     "HAPROXY_SYSCTL_PARAMS": "net.ipv4.tcp_tw_reuse=1 net.ipv4.tcp_fin_timeout=30 net.ipv4.tcp_max_syn_backlog=10240 net.ipv4.tcp_max_tw_buckets=400000 net.ipv4.tcp_max_orphans=60000 net.core.somaxconn=10000"
   },
   "healthChecks": [
@@ -40,6 +40,8 @@
     "http://master.mesos:8080",
     "--health-check",
     "--group",
+    "--ssl-certs",
+    "/etc/ssl/wso2demo.pem",
     "marathon-lb"
   ],
   "requirePorts": true,
