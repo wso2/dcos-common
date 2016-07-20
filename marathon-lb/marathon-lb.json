@@ -40,9 +40,9 @@
     "http://master.mesos:8080",
     "--health-check",
     "--group",
+    "marathon-lb",
     "--ssl-certs",
-    "/etc/ssl/wso2demo.pem",
-    "marathon-lb"
+    "/etc/ssl/wso2demo.pem"
   ],
   "requirePorts": true,
   "upgradeStrategy": {
