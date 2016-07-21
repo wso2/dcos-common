@@ -6,7 +6,7 @@
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "svn:1.0.0",
+      "image": "wso2/svn:1.0.0",
       "network": "BRIDGE",
       "portMappings": [
         {
