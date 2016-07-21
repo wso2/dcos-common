@@ -151,7 +151,7 @@ function showUsageAndExitDefault() {
 }
 
 function deploy_common_service() {
-  if ! bash ${mesos_artifacts_home}/common/${1}/deploy.sh; then
+  if ! bash ${mesos_artifacts_home}/common/artifacts/${1}/deploy.sh; then
     echoError "Aborting deployment"
     exit 1
   fi
@@ -180,6 +180,11 @@ function deploy_service() {
 function deploy_common_services() {
   deploy_common_service 'marathon-lb'
   deploy_common_service 'wso2-shared-dbs'
+}
+
+function undeploy_common_services() {
+  bash ${mesos_artifacts_home}/common/artifacts/wso2-shared-dbs/undeploy.sh
+  bash ${mesos_artifacts_home}/common/artifacts/marathon-lb/undeploy.sh
 }
 
 function getMesosNodes(){

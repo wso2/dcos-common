@@ -21,7 +21,7 @@
   "env": {
     "USERNAME": "wso2carbon",
     "PASSWORD": "wso2carbon",
-    "REPO_LIST": "ESB,BPS"
+    "REPO_LIST": "esb,bps"
   },
   "labels": {
   "HAPROXY_0_GROUP": "marathon-lb"

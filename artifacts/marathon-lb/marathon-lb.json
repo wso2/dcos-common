@@ -7,7 +7,7 @@
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "wso2/marathon-lb:v1.3.0",
+      "image": "wso2/marathon-lb:v1.3.1",
       "network": "HOST",
       "privileged": true
     }

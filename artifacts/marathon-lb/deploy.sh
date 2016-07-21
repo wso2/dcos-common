@@ -19,8 +19,12 @@
 
 set -e
 self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-mesos_artifacts_home="${self_path}/../.."
+mesos_artifacts_home="${self_path}/../../.."
 source "${mesos_artifacts_home}/common/scripts/base.sh"
+app_name=marathon-lb
 
-undeploy mysql-gov-db
-undeploy mysql-user-db
+if ! deploy ${app_name} "${self_path}/${app_name}.json"; then
+  echoError "Failed to deploy ${app_name}"
+  exit 1
+fi
+waitUntilServiceIsActive ${app_name}

@@ -19,12 +19,20 @@
 
 set -e
 self_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-mesos_artifacts_home="${self_path}/../.."
+mesos_artifacts_home="${self_path}/../../.."
 source "${mesos_artifacts_home}/common/scripts/base.sh"
-app_name=marathon-lb
+mysql_gov_db_host_port=10000
+mysql_user_db_host_port=10001
 
-if ! deploy ${app_name} "${self_path}/${app_name}.json"; then
-  echoError "Failed to deploy ${app_name}"
+echo "Deploying WSO2 shared databases..."
+
+deploy_gov_db="deploy mysql-gov-db ${self_path}/mysql-gov-db.json"
+deploy_user_db="deploy mysql-user-db ${self_path}/mysql-user-db.json"
+
+if ! ($deploy_gov_db && $deploy_user_db); then
+  echoError "Failed to deploy WSO2 shared databases"
   exit 1
 fi
-waitUntilServiceIsActive ${app_name}
+waitUntilServiceIsActive 'mysql-gov-db'
+waitUntilServiceIsActive 'mysql-user-db'
+echoSuccess "Successfully deployed WSO2 shared databases"
