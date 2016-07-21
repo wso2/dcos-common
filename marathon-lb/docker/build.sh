@@ -17,4 +17,4 @@
 
 # ------------------------------------------------------------------------
 
-docker build --no-cache=true -t wso2/marathon-lb:v1.3.0 ./
+docker build --no-cache=true -t wso2/marathon-lb:v1.3.1 ./

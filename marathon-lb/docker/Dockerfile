@@ -18,8 +18,8 @@
 
 FROM mesosphere/marathon-lb:v1.3.1
 
-COPY config.py /marathon-lb
 COPY run /marathon-lb
 COPY wso2demo.pem /etc/ssl/
+COPY templates/* /marathon-lb/templates
 
 WORKDIR /marathon-lb

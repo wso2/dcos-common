@@ -1,4 +1,22 @@
 #!/bin/bash
+# ------------------------------------------------------------------------
+#
+# Copyright 2016 WSO2, Inc. (http://wso2.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
+
+# ------------------------------------------------------------------------
+
 set -euo pipefail
 
 SYSLOG_SOCKET=${SYSLOG_SOCKET:-/dev/null}
@@ -27,7 +45,7 @@ done
 if [ $ssl_certs_pos -gt 0 ]; then
   SSL_CERTS=${!ssl_certs_pos}
   set -- "${@:1:$(($ssl_certs_pos-2))}" "${@:$(($ssl_certs_pos+1))}"
-  [ -n "${HAPROXY_SSL_CERT-}" ] && SSL_CERTS+=",/etc/ssl/cert.pem"
+  [ -n "${HAPROXY_SSL_CERT-}" ]
 else
   SSL_CERTS="/etc/ssl/cert.pem"
 fi
@@ -46,11 +64,11 @@ if [ -n "${HAPROXY_SSL_CERT-}" ]; then
     fi
   done
   # create self-signed ssl certificate
-  openssl genrsa -out /tmp/server-key.pem 2048
-  openssl req -new -key /tmp/server-key.pem -out /tmp/server-csr.pem -subj /CN=*/
-  openssl x509 -req -in /tmp/server-csr.pem -out /tmp/server-cert.pem -signkey /tmp/server-key.pem -days 3650
-  cat /tmp/server-cert.pem /tmp/server-key.pem > /etc/ssl/cert.pem
-  rm /tmp/server-*.pem
+#  openssl genrsa -out /tmp/server-key.pem 2048
+#  openssl req -new -key /tmp/server-key.pem -out /tmp/server-csr.pem -subj /CN=*/
+#  openssl x509 -req -in /tmp/server-csr.pem -out /tmp/server-cert.pem -signkey /tmp/server-key.pem -days 3650
+#  cat /tmp/server-cert.pem /tmp/server-key.pem > /etc/ssl/cert.pem
+#  rm /tmp/server-*.pem
 fi
 
 if [ -n "${MESOS_SANDBOX-}" ] && [ -d "$MESOS_SANDBOX/templates" ]; then
