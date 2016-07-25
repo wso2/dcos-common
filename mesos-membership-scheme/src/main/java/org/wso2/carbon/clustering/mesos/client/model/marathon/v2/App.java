@@ -116,9 +116,9 @@ public class App {
 
 	public void addConstraint(String attribute, String operator, String value) {
 		if (this.constraints == null) {
-			this.constraints = new ArrayList<List<String>>();
+			this.constraints = new ArrayList<>();
 		}
-		List<String> constraint = new ArrayList<String>(3);
+		List<String> constraint = new ArrayList<>(3);
 		constraint.add(attribute == null ? "" : attribute);
 		constraint.add(operator == null ? "" : operator);
 		constraint.add(value == null ? "" : value);
@@ -159,14 +159,14 @@ public class App {
 
 	public void addUri(String uri) {
 		if (this.uris == null) {
-			this.uris = new ArrayList<String>();
+			this.uris = new ArrayList<>();
 		}
 		this.uris.add(uri);
 	}
 
 	public void addPort(int port) {
 		if (this.ports == null) {
-			this.ports = new ArrayList<Integer>();
+			this.ports = new ArrayList<>();
 		}
 		this.ports.add(port);
 	}
@@ -237,7 +237,7 @@ public class App {
 
 	public void addLabel(String key, String value) {
 		if (this.labels == null) {
-			this.labels = new HashMap<String, String>();
+			this.labels = new HashMap<>();
 		}
 		this.labels.put(key, value);
 	}
