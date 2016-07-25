@@ -1,8 +1,7 @@
 {
   "id": "/marathon-lb",
-  "cpus": 0.5,
-  "mem": 256,
-  "disk": 0,
+  "cpus": 2,
+  "mem": 2048,
   "instances": 1,
   "container": {
     "type": "DOCKER",
