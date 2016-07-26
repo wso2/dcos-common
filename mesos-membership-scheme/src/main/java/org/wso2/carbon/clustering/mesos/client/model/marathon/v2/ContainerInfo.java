@@ -43,7 +43,7 @@ public class ContainerInfo {
 
     public void addOption(String option) {
         if (options == null) {
-            options = new ArrayList<String>();
+            options = new ArrayList<>();
         }
         options.add(option);
     }

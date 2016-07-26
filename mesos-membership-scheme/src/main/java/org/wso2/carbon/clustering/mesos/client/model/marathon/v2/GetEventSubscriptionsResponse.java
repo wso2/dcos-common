@@ -20,7 +20,7 @@ import java.util.List;
 
 public class GetEventSubscriptionsResponse {
 
-    List<String> callbackUrls = new ArrayList<String>();
+    List<String> callbackUrls = new ArrayList<>();
 
     public List<String> getCallbackUrls() {
         return this.callbackUrls;

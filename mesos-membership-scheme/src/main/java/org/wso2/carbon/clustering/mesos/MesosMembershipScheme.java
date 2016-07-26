@@ -50,7 +50,6 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
     private final NetworkConfig nwConfig;
     private final Map<String, Parameter> parameters;
     private final List<ClusteringMessage> messageBuffer;
-    private final String primaryDomain;
     private HazelcastInstance primaryHazelcastInstance;
     private HazelcastCarbonClusterImpl carbonCluster;
 
@@ -70,7 +69,6 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
                                  HazelcastInstance primaryHazelcastInstance,
                                  List<ClusteringMessage> messageBuffer) {
         this.parameters = parameters;
-        this.primaryDomain = primaryDomain;
         this.primaryHazelcastInstance = primaryHazelcastInstance;
         this.messageBuffer = messageBuffer;
         this.nwConfig = config.getNetworkConfig();

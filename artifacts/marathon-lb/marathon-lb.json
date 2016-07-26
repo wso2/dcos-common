@@ -1,8 +1,7 @@
 {
   "id": "/marathon-lb",
-  "cpus": 0.5,
-  "mem": 256,
-  "disk": 0,
+  "cpus": 2,
+  "mem": 2048,
   "instances": 1,
   "container": {
     "type": "DOCKER",
@@ -13,7 +12,6 @@
     }
   },
   "env": {
-    "HAPROXY_SSL_CERT": "/etc/ssl/wso2demo.pem",
     "HAPROXY_SYSCTL_PARAMS": "net.ipv4.tcp_tw_reuse=1 net.ipv4.tcp_fin_timeout=30 net.ipv4.tcp_max_syn_backlog=10240 net.ipv4.tcp_max_tw_buckets=400000 net.ipv4.tcp_max_orphans=60000 net.core.somaxconn=10000"
   },
   "healthChecks": [
