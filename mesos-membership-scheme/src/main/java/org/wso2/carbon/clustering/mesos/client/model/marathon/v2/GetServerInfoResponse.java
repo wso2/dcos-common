@@ -98,7 +98,7 @@ public class GetServerInfoResponse {
         return ModelUtils.toString(this);
     }
 
-    public class ZookeeperConfig {
+    public static class ZookeeperConfig {
         private String zk;
         private String zk_hosts;
         private String zk_path;
@@ -177,7 +177,7 @@ public class GetServerInfoResponse {
         }
     }
 
-    public class MarathonConfig {
+    public static class MarathonConfig {
         private Boolean checkpoint;
         private String executor;
         private Integer failover_timeout;
@@ -302,7 +302,7 @@ public class GetServerInfoResponse {
         }
     }
 
-    public class EventSubscriber {
+    public static class EventSubscriber {
         private String type;
         private Collection<String> http_endpoints;
 
@@ -328,7 +328,7 @@ public class GetServerInfoResponse {
         }
     }
 
-    public class HttpConfig {
+    public static class HttpConfig {
         private String assets_path;
         private String http_port;
         private String https_port;

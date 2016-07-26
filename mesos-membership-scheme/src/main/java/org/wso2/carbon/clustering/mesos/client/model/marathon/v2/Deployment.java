@@ -90,7 +90,7 @@ public class Deployment {
         return ModelUtils.toString(this);
     }
 
-    public class Action {
+    public  static class Action {
         private String action;
         private String app;
 
