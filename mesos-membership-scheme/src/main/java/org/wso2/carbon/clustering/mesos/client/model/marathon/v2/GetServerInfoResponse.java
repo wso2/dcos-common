@@ -159,7 +159,7 @@ public class GetServerInfoResponse {
             return ModelUtils.toString(this);
         }
 
-        public class ZkFutureTimeout {
+        public static class ZkFutureTimeout {
             private Integer duration;
 
             public Integer getDuration() {
