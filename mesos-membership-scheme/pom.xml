@@ -82,6 +82,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Export-Package>
+                            org.wso2.carbon.clustering.mesos.*,
+                        </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.core.*;version="${carbon.platform.imp.pkg.version.range}",
                             org.wso2.carbon.utils.*;version="${carbon.platform.imp.pkg.version.range}",
