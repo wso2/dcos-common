@@ -36,26 +36,47 @@ public class MesosMembershipSchemeTestCase {
     private static final Log log = LogFactory.getLog(MesosMembershipSchemeTestCase.class);
 
     @Test
-    public void testMarathonClient() throws Exception {
+    public void testMarathonClientWithOverlay() throws Exception {
         Config primaryHazelcastConfig;
         HazelcastInstance primaryHazelcastInstance;
         Map<String, Parameter> parameters = new HashMap<>();
         List<ClusteringMessage> messageBuffer;
 
-        parameters.put(MesosConstants.MARATHON_ENDPOINT, new Parameter(MesosConstants.MARATHON_ENDPOINT,
-                "http://m1.dcos:8080"));
-        parameters.put(MesosConstants.MARATHON_APP_ID, new Parameter(MesosConstants.MARATHON_ENDPOINT,
-                "wso2esb-worker"));
-        parameters.put(MesosConstants.MARATHON_APPLICATIONS, new Parameter(MesosConstants.MARATHON_ENDPOINT,
-                "wso2esb-manager"));
+        parameters.put(MesosConstants.MARATHON_ENDPOINT, new Parameter(MesosConstants.MARATHON_ENDPOINT, "http://m1.dcos:8080"));
+        parameters.put(MesosConstants.MARATHON_APP_ID, new Parameter(MesosConstants.MARATHON_ENDPOINT, "wso2esb-worker"));
+        parameters.put(MesosConstants.MARATHON_APPLICATIONS, new Parameter(MesosConstants.MARATHON_ENDPOINT, "wso2esb-manager"));
+        parameters.put(MesosConstants.IS_OVERLAY_NETWORK_AND_DOCKER, new Parameter(MesosConstants.IS_OVERLAY_NETWORK_AND_DOCKER, "true"));
 
         String primaryDomain = "TestDomain";
         messageBuffer = new ArrayList<>();
         primaryHazelcastConfig = new Config();
         primaryHazelcastInstance = Hazelcast.newHazelcastInstance(primaryHazelcastConfig);
 
-        MesosMembershipScheme mesosMembershipScheme = new MesosMembershipScheme(parameters, primaryDomain,
-                primaryHazelcastConfig, primaryHazelcastInstance, messageBuffer);
+        MesosMembershipScheme mesosMembershipScheme = new MesosMembershipScheme(parameters, primaryDomain, primaryHazelcastConfig,
+                primaryHazelcastInstance, messageBuffer);
+        mesosMembershipScheme.init();
+        TcpIpConfig tcpIpConfig = primaryHazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig();
+        log.info("Hazelcast cluster member list: " + tcpIpConfig.getMembers());
+    }
+
+    @Test
+    public void testMarathonClient() throws Exception {
+        Config primaryHazelcastConfig;
+        HazelcastInstance primaryHazelcastInstance;
+        Map<String, Parameter> parameters = new HashMap<>();
+        List<ClusteringMessage> messageBuffer;
+
+        parameters.put(MesosConstants.MARATHON_ENDPOINT, new Parameter(MesosConstants.MARATHON_ENDPOINT, "http://m1.dcos:8080"));
+        parameters.put(MesosConstants.MARATHON_APP_ID, new Parameter(MesosConstants.MARATHON_ENDPOINT, "wso2esb-worker"));
+        parameters.put(MesosConstants.MARATHON_APPLICATIONS, new Parameter(MesosConstants.MARATHON_ENDPOINT, "wso2esb-manager"));
+
+        String primaryDomain = "TestDomain";
+        messageBuffer = new ArrayList<>();
+        primaryHazelcastConfig = new Config();
+        primaryHazelcastInstance = Hazelcast.newHazelcastInstance(primaryHazelcastConfig);
+
+        MesosMembershipScheme mesosMembershipScheme = new MesosMembershipScheme(parameters, primaryDomain, primaryHazelcastConfig,
+                primaryHazelcastInstance, messageBuffer);
         mesosMembershipScheme.init();
         TcpIpConfig tcpIpConfig = primaryHazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig();
         log.info("Hazelcast cluster member list: " + tcpIpConfig.getMembers());
@@ -68,23 +89,19 @@ public class MesosMembershipSchemeTestCase {
         Map<String, Parameter> parameters = new HashMap<>();
         List<ClusteringMessage> messageBuffer;
 
-        parameters.put(MesosConstants.MESOS_DNS_ENDPOINT, new Parameter(MesosConstants.MESOS_DNS_ENDPOINT,
-                "http://m1.dcos:8123"));
-        parameters.put(MesosConstants.MESOS_MEMBER_DISCOVERY_SCHEME, new Parameter(MesosConstants
-                .MESOS_MEMBER_DISCOVERY_SCHEME,
-                MesosConstants.MESOS_DNS_DISCOVERY_SCHEME));
-        parameters.put(MesosConstants.MARATHON_APP_ID, new Parameter(MesosConstants.MARATHON_ENDPOINT,
-                "wso2esb-worker"));
-        parameters.put(MesosConstants.MARATHON_APPLICATIONS, new Parameter(MesosConstants.MARATHON_ENDPOINT,
-                "wso2esb-manager"));
+        parameters.put(MesosConstants.MESOS_DNS_ENDPOINT, new Parameter(MesosConstants.MESOS_DNS_ENDPOINT, "http://m1.dcos:8123"));
+        parameters.put(MesosConstants.MESOS_MEMBER_DISCOVERY_SCHEME,
+                new Parameter(MesosConstants.MESOS_MEMBER_DISCOVERY_SCHEME, MesosConstants.MESOS_DNS_DISCOVERY_SCHEME));
+        parameters.put(MesosConstants.MARATHON_APP_ID, new Parameter(MesosConstants.MARATHON_ENDPOINT, "wso2esb-worker"));
+        parameters.put(MesosConstants.MARATHON_APPLICATIONS, new Parameter(MesosConstants.MARATHON_ENDPOINT, "wso2esb-manager"));
 
         String primaryDomain = "TestDomain";
         messageBuffer = new ArrayList<>();
         primaryHazelcastConfig = new Config();
         primaryHazelcastInstance = Hazelcast.newHazelcastInstance(primaryHazelcastConfig);
 
-        MesosMembershipScheme mesosMembershipScheme = new MesosMembershipScheme(parameters, primaryDomain,
-                primaryHazelcastConfig, primaryHazelcastInstance, messageBuffer);
+        MesosMembershipScheme mesosMembershipScheme = new MesosMembershipScheme(parameters, primaryDomain, primaryHazelcastConfig,
+                primaryHazelcastInstance, messageBuffer);
         mesosMembershipScheme.init();
         TcpIpConfig tcpIpConfig = primaryHazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig();
         log.info("Hazelcast cluster member list: " + tcpIpConfig.getMembers());

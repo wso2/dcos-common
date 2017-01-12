@@ -27,6 +27,7 @@ public class Task {
     private String stagedAt;
     private String startedAt;
     private Collection<HealthCheckResult> healthCheckResults;
+    private Collection<IpAddress> ipAddresses;
 
     public String getHost() {
         return host;
@@ -82,6 +83,14 @@ public class Task {
 
     public void setHealthCheckResults(Collection<HealthCheckResult> healthCheckResults) {
         this.healthCheckResults = healthCheckResults;
+    }
+
+    public Collection<IpAddress> getIpAddresses() {
+        return ipAddresses;
+    }
+
+    public void setIpAddresses(Collection<IpAddress> ipAddresses) {
+        this.ipAddresses = ipAddresses;
     }
 
     @Override

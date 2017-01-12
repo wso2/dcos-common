@@ -15,10 +15,32 @@
 */
 package org.wso2.carbon.clustering.mesos;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.NetworkConfig;
-import com.hazelcast.config.TcpIpConfig;
-import com.hazelcast.core.*;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_REQUEST_TIMEOUT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.CONNECTION_TIMEOUT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.DEFAULT_DNS_UPDATE_TIMEOUT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.DEFAULT_MARATHON_ENDPOINT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.DEFAULT_MESOS_DNS_ENDPOINT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.DNS_RETRY_INTERVAL;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.DNS_UPDATE_TIMEOUT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.ENABLE_BASIC_AUTH;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.IS_OVERLAY_NETWORK_AND_DOCKER;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MARATHON_APPLICATIONS;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MARATHON_APP_ID;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MARATHON_ENDPOINT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MARATHON_PASSWORD;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MARATHON_USERNAME;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MESOS_DNS_DISCOVERY_SCHEME;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MESOS_DNS_ENDPOINT;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MESOS_MARATHON_DISCOVERY_SCHEME;
+import static org.wso2.carbon.clustering.mesos.MesosConstants.MESOS_MEMBER_DISCOVERY_SCHEME;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.clustering.ClusteringMessage;
 import org.apache.axis2.description.Parameter;
@@ -29,6 +51,9 @@ import org.wso2.carbon.clustering.mesos.client.MesosDNS;
 import org.wso2.carbon.clustering.mesos.client.MesosDNSClient;
 import org.wso2.carbon.clustering.mesos.client.MesosMarathonClient;
 import org.wso2.carbon.clustering.mesos.client.model.dns.v1.MesosDNSSRVRecord;
+import org.wso2.carbon.clustering.mesos.client.model.marathon.v2.App;
+import org.wso2.carbon.clustering.mesos.client.model.marathon.v2.IpAddress;
+import org.wso2.carbon.clustering.mesos.client.model.marathon.v2.Port;
 import org.wso2.carbon.clustering.mesos.client.model.marathon.v2.Task;
 import org.wso2.carbon.clustering.mesos.client.utils.MesosException;
 import org.wso2.carbon.core.clustering.hazelcast.HazelcastCarbonClusterImpl;
@@ -36,14 +61,18 @@ import org.wso2.carbon.core.clustering.hazelcast.HazelcastMembershipScheme;
 import org.wso2.carbon.core.clustering.hazelcast.HazelcastUtil;
 import org.wso2.carbon.utils.xml.StringUtils;
 
-import java.util.*;
-
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_REQUEST_TIMEOUT;
-import static org.wso2.carbon.clustering.mesos.MesosConstants.*;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.config.TcpIpConfig;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.Member;
+import com.hazelcast.core.MemberAttributeEvent;
+import com.hazelcast.core.MembershipEvent;
+import com.hazelcast.core.MembershipListener;
 
 /**
- * Mesos membership scheme provides cluster discovery for WSO2 Carbon servers on Apache Mesos platform
+ * Mesos membership scheme provides cluster discovery for WSO2 Carbon servers on
+ * Apache Mesos platform
  */
 public class MesosMembershipScheme implements HazelcastMembershipScheme {
     private static final Log log = LogFactory.getLog(MesosMembershipScheme.class);
@@ -61,13 +90,11 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
     private String marathonUsername;
     private String marathonPassword;
     private String mesosDNSEndpoint;
+    private boolean isOverlayNetwork;
     private int dnsUpdateTimeout;
 
-    public MesosMembershipScheme(Map<String, Parameter> parameters,
-                                 String primaryDomain,
-                                 Config config,
-                                 HazelcastInstance primaryHazelcastInstance,
-                                 List<ClusteringMessage> messageBuffer) {
+    public MesosMembershipScheme(Map<String, Parameter> parameters, String primaryDomain, Config config,
+            HazelcastInstance primaryHazelcastInstance, List<ClusteringMessage> messageBuffer) {
         this.parameters = parameters;
         this.primaryHazelcastInstance = primaryHazelcastInstance;
         this.messageBuffer = messageBuffer;
@@ -100,8 +127,7 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
                 addMembersFromMesosMarathon();
             } else {
                 throw new ClusteringFault(
-                        String.format("Unsupported Mesos member discovery scheme [Discovery-Scheme] %s",
-                                memberDiscoveryScheme));
+                        String.format("Unsupported Mesos member discovery scheme [Discovery-Scheme] %s", memberDiscoveryScheme));
             }
             log.info("Mesos clustering membership scheme initialized successfully");
         } catch (Exception e) {
@@ -119,15 +145,17 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
             }
             String mesosServiceName = "_" + marathonAppId + "._tcp.marathon.mesos.";
             if (log.isDebugEnabled()) {
-                log.debug(String.format("Retrieving member information for service [Name] %s via Mesos DNS client",
-                        mesosServiceName));
+                log.debug(String.format("Retrieving member information for service [Name] %s via Mesos DNS client", mesosServiceName));
             }
             try {
-                // Mesos-DNS periodically queries the Mesos master and retrieves a list of services and populates DNS
-                // SRV records. There could be a delay to reflect the latest state therefore we wait for a given timeout
+                // Mesos-DNS periodically queries the Mesos master and retrieves
+                // a list of services and populates DNS
+                // SRV records. There could be a delay to reflect the latest
+                // state therefore we wait for a given timeout
                 if (!hasDNSUpdated(mesosDNSClient, mesosServiceName)) {
-                    log.error(String.format("Mesos DNS has not updated SRV records within [Timeout] %ss. Could not " +
-                            "add members in [AppId] %s", DEFAULT_DNS_UPDATE_TIMEOUT, marathonAppId));
+                    log.error(String.format(
+                            "Mesos DNS has not updated SRV records within [Timeout] %ss. Could not " + "add members in [AppId] %s",
+                            DEFAULT_DNS_UPDATE_TIMEOUT, marathonAppId));
                     continue;
                 }
                 List<MesosDNSSRVRecord> mesosDNSSRVRecords = mesosDNSClient.getService(mesosServiceName);
@@ -135,15 +163,17 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
                     log.debug("Mesos DNS SRV record list: " + mesosDNSSRVRecords);
                 }
                 if (mesosDNSSRVRecords == null || mesosDNSSRVRecords.isEmpty() || mesosDNSSRVRecords.get(0) == null) {
-                    log.error(String.format("Mesos DNS SRV record list is empty. Could not add members in [AppId] %s",
-                            marathonAppId));
+                    log.error(String.format("Mesos DNS SRV record list is empty. Could not add members in [AppId] %s", marathonAppId));
                     continue;
                 }
                 int hazelcastPort = Integer.parseInt(mesosDNSSRVRecords.get(0).getPort());
                 String hazelcastIp = mesosDNSSRVRecords.get(0).getIp();
-                // Mesos DNS API does not return an ordered list. Therefore need to search for the Hazelcast port by
-                // iterating the list and taking the record with lowest numerical port value. By convention we define
-                // Hazelcast port as the first port mapping hence it should get the lowest numerical port value
+                // Mesos DNS API does not return an ordered list. Therefore need
+                // to search for the Hazelcast port by
+                // iterating the list and taking the record with lowest
+                // numerical port value. By convention we define
+                // Hazelcast port as the first port mapping hence it should get
+                // the lowest numerical port value
                 for (MesosDNSSRVRecord mesosDNSSRVRecord : mesosDNSSRVRecords) {
                     int port = Integer.parseInt(mesosDNSSRVRecord.getPort());
                     if (hazelcastPort > port) {
@@ -164,11 +194,10 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - startTime < dnsUpdateTimeout * 1000) {
             List<MesosDNSSRVRecord> mesosDNSSRVRecords = mesosDNSClient.getService(mesosServiceName);
-            if (mesosDNSSRVRecords.isEmpty() || mesosDNSSRVRecords.get(0) == null ||
-                    StringUtils.isEmpty(mesosDNSSRVRecords.get(0).getIp()) ||
-                    StringUtils.isEmpty(mesosDNSSRVRecords.get(0).getPort())) {
-                log.info(String.format("DNS records have not been updated for Mesos service [Name] %s. " +
-                        "Retrying in %ds...", mesosServiceName, DNS_RETRY_INTERVAL));
+            if (mesosDNSSRVRecords.isEmpty() || mesosDNSSRVRecords.get(0) == null || StringUtils.isEmpty(mesosDNSSRVRecords.get(0).getIp())
+                    || StringUtils.isEmpty(mesosDNSSRVRecords.get(0).getPort())) {
+                log.info(String.format("DNS records have not been updated for Mesos service [Name] %s. " + "Retrying in %ds...",
+                        mesosServiceName, DNS_RETRY_INTERVAL));
                 try {
                     Thread.sleep(DNS_RETRY_INTERVAL * 1000);
                 } catch (InterruptedException e) {
@@ -182,12 +211,11 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
     }
 
     private void addMembersFromMesosMarathon() {
-        log.info(String.format("Creating Mesos Marathon client using [Endpoint] %s, [Basic-Auth-Enabled] %s",
-                marathonEndpoint, enableBasicAuth));
+        log.info(String.format("Creating Mesos Marathon client using [Endpoint] %s, [Basic-Auth-Enabled] %s", marathonEndpoint,
+                enableBasicAuth));
         Marathon marathonClient;
         if (enableBasicAuth) {
-            marathonClient = MesosMarathonClient.getInstanceWithBasicAuth(marathonEndpoint,
-                    marathonUsername, marathonPassword);
+            marathonClient = MesosMarathonClient.getInstanceWithBasicAuth(marathonEndpoint, marathonUsername, marathonPassword);
         } else {
             marathonClient = MesosMarathonClient.getInstance(marathonEndpoint);
         }
@@ -197,13 +225,17 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
                 continue;
             }
             if (log.isDebugEnabled()) {
-                log.debug(String.format("Retrieving Marathon application information for [AppId] %s via Mesos " +
-                        "Marathon client", marathonAppId));
+                log.debug(String.format("Retrieving Marathon application information for [AppId] %s via Mesos " + "Marathon client",
+                        marathonAppId));
             }
             Collection<Task> tasksCollection;
             try {
-                tasksCollection = marathonClient.getApp(marathonAppId).getApp().getTasks();
-                addMembersFromMarathonTasks(marathonAppId, tasksCollection);
+                if (isOverlayNetwork) {
+                    addMembersFromMarathonInfo(marathonAppId, marathonClient.getApp(marathonAppId).getApp());
+                } else {
+                    tasksCollection = marathonClient.getApp(marathonAppId).getApp().getTasks();
+                    addMembersFromMarathonTasks(marathonAppId, tasksCollection);
+                }
             } catch (MesosException e) {
                 handleMesosException(e, marathonAppId);
             }
@@ -212,15 +244,48 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
 
     private void handleMesosException(MesosException e, String marathonAppId) {
         if (e.getStatus() == SC_NOT_FOUND) {
-            // Log a warning and continue, let the dependent applications (that may not have been deployed yet) add
+            // Log a warning and continue, let the dependent applications (that
+            // may not have been deployed yet) add
             // this node to the cluster
             log.warn(String.format("Marathon application [AppId] %s was not found", marathonAppId));
         } else if (e.getStatus() == SC_REQUEST_TIMEOUT) {
-            log.error("Marathon REST API call timed out. Please check whether Marathon REST API is " +
-                    "accessible via the given endpoint", e);
+            log.error("Marathon REST API call timed out. Please check whether Marathon REST API is " + "accessible via the given endpoint",
+                    e);
         } else {
-            log.error(String.format("Failed to retrieve Marathon application information: [AppId] %s",
-                    marathonAppId), e);
+            log.error(String.format("Failed to retrieve Marathon application information: [AppId] %s", marathonAppId), e);
+        }
+    }
+
+    private void addMembersFromMarathonInfo(String marathonAppId, App marathonApp) {
+        if (marathonApp.getContainer() == null || marathonApp.getContainer().getDocker() == null
+                || marathonApp.getContainer().getDocker().getPortMappings() == null
+                || marathonApp.getContainer().getDocker().getPortMappings().isEmpty()) {
+            log.warn(String.format("Docker containerPort collection is empty for Marathon app [AppId] %s", marathonAppId));
+        }
+        Integer hazelcastPort = marathonApp.getContainer().getDocker().getPortMappings().iterator().next().getContainerPort();
+        for (Port port : marathonApp.getContainer().getDocker().getPortMappings()) {
+            if (hazelcastPort > port.getContainerPort()) {
+                hazelcastPort = port.getContainerPort();
+            }
+        }
+        if (marathonApp.getTasks() == null || marathonApp.getTasks().isEmpty()) {
+            log.warn(String.format("Task collection is empty for Marathon app [AppId] %s", marathonAppId));
+            return;
+        }
+        for (Task task : marathonApp.getTasks()) {
+            if (task.getIpAddresses() == null || task.getIpAddresses().isEmpty()) {
+                log.warn(String.format("IPAddresses collection is empty for Marathon app [AppId] %s", marathonAppId));
+                return;
+            }
+            // by default, get IPV4. We must configure if we want IPV6.
+            String ipAddress = "";
+            for (IpAddress address : task.getIpAddresses()) {
+                if (address.getProtocol().equals(MesosConstants.IP_ADDRESS_PROTOCOL_IPV4)) {
+                    ipAddress = address.getIpAddress();
+                }
+            }
+            String memberAddress = ipAddress + ":" + hazelcastPort.toString();
+            nwConfig.getJoin().getTcpIpConfig().addMember(memberAddress);
         }
     }
 
@@ -232,13 +297,11 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
         for (Task task : tasksCollection) {
             String hostname = task.getHost();
             if (StringUtils.isEmpty(hostname)) {
-                log.warn(String.format("Hostname is empty for Marathon task [AppId] %s, [Task] %s",
-                        marathonAppId, task));
+                log.warn(String.format("Hostname is empty for Marathon task [AppId] %s, [Task] %s", marathonAppId, task));
                 continue;
             }
             if (task.getPorts() == null || task.getPorts().size() == 0) {
-                log.warn(String.format("Port is empty for Marathon task [AppId] %s, [Task] %s",
-                        marathonAppId, task));
+                log.warn(String.format("Port is empty for Marathon task [AppId] %s, [Task] %s", marathonAppId, task));
                 continue;
             }
             Integer port = task.getPorts().iterator().next();
@@ -262,13 +325,14 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
         mesosDNSEndpoint = getParameterValue(MESOS_DNS_ENDPOINT, DEFAULT_MESOS_DNS_ENDPOINT);
         dnsUpdateTimeout = Integer.parseInt(getParameterValue(DNS_UPDATE_TIMEOUT, DEFAULT_DNS_UPDATE_TIMEOUT));
         marathonAppIdList = new ArrayList<>();
+        isOverlayNetwork = Boolean.parseBoolean(getParameterValue(IS_OVERLAY_NETWORK_AND_DOCKER, Boolean.FALSE.toString()));
 
         String localAppId = getParameterValue(MARATHON_APP_ID, "");
         if (StringUtils.isEmpty(localAppId)) {
-            throw new IllegalArgumentException(String.format("%s property was not found in environment variables",
-                    MARATHON_APP_ID));
+            throw new IllegalArgumentException(String.format("%s property was not found in environment variables", MARATHON_APP_ID));
         }
-        // MARATHON_APP_ID environment variable passed to instance contains forward-slash prefix
+        // MARATHON_APP_ID environment variable passed to instance contains
+        // forward-slash prefix
         if (localAppId.startsWith("/")) {
             localAppId = localAppId.substring(1);
         }
@@ -283,8 +347,9 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
         if (!marathonAppIdList.contains(localAppId)) {
             marathonAppIdList.add(localAppId);
         }
-        log.info(String.format("Mesos clustering membership scheme configuration: [App-List] %s, [Local-AppId] %s, " +
-                "[Discovery-Scheme] %s", marathonAppIdList, localAppId, memberDiscoveryScheme));
+        log.info(String.format(
+                "Mesos clustering membership scheme configuration: [App-List] %s, [Local-AppId] %s, " + "[Discovery-Scheme] %s",
+                marathonAppIdList, localAppId, memberDiscoveryScheme));
     }
 
     private String getParameterValue(String key, String def) {
@@ -331,9 +396,9 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
 
             // Send all cluster messages
             carbonCluster.memberAdded(member);
-            log.info(String.format("Member joined: [UUID] %s, [Address] %s", member.getUuid(),
-                    member.getSocketAddress().toString()));
-            // Wait for sometime for the member to completely join before replaying messages
+            log.info(String.format("Member joined: [UUID] %s, [Address] %s", member.getUuid(), member.getSocketAddress().toString()));
+            // Wait for sometime for the member to completely join before
+            // replaying messages
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ignored) {
@@ -345,15 +410,13 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
         public void memberRemoved(MembershipEvent membershipEvent) {
             Member member = membershipEvent.getMember();
             carbonCluster.memberRemoved(member);
-            log.info(String.format("Member left: [UUID] %s, [Address] %s", member.getUuid(),
-                    member.getSocketAddress().toString()));
+            log.info(String.format("Member left: [UUID] %s, [Address] %s", member.getUuid(), member.getSocketAddress().toString()));
         }
 
         @Override
         public void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
             if (log.isDebugEnabled()) {
-                log.debug(String.format("Member attribute changed: [Key] %s, [Value] %s",
-                        memberAttributeEvent.getKey(),
+                log.debug(String.format("Member attribute changed: [Key] %s, [Value] %s", memberAttributeEvent.getKey(),
                         memberAttributeEvent.getValue()));
             }
         }
