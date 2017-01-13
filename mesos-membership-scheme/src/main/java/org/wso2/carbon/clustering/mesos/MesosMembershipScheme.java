@@ -231,7 +231,7 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
             Collection<Task> tasksCollection;
             try {
                 if (isOverlayNetwork) {
-                    addMembersFromMarathonInfo(marathonAppId, marathonClient.getApp(marathonAppId).getApp());
+                    addMembersFromMarathonDockerInfo(marathonAppId, marathonClient.getApp(marathonAppId).getApp());
                 } else {
                     tasksCollection = marathonClient.getApp(marathonAppId).getApp().getTasks();
                     addMembersFromMarathonTasks(marathonAppId, tasksCollection);
@@ -256,7 +256,7 @@ public class MesosMembershipScheme implements HazelcastMembershipScheme {
         }
     }
 
-    private void addMembersFromMarathonInfo(String marathonAppId, App marathonApp) {
+    private void addMembersFromMarathonDockerInfo(String marathonAppId, App marathonApp) {
         if (marathonApp.getContainer() == null || marathonApp.getContainer().getDocker() == null
                 || marathonApp.getContainer().getDocker().getPortMappings() == null
                 || marathonApp.getContainer().getDocker().getPortMappings().isEmpty()) {
