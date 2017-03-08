@@ -18,7 +18,7 @@ package org.wso2.carbon.clustering.mesos.client.model.marathon.v2;
 import org.wso2.carbon.clustering.mesos.client.utils.ModelUtils;
 
 public class HealthCheck {
-    private String command;
+    private Command command;
     private Integer gracePeriodSeconds;
     private Integer intervalSeconds;
     private Integer maxConsecutiveFailures;
@@ -92,11 +92,11 @@ public class HealthCheck {
         this.protocol = protocol;
     }
 
-    public String getCommand() {
+    public Command getCommand() {
         return command;
     }
 
-    public void setCommand(String command) {
+    public void setCommand(Command command) {
         this.command = command;
     }
 
