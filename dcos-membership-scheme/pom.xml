@@ -19,16 +19,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.wso2.carbon.mesos.artifacts</groupId>
-        <artifactId>wso2-mesos-artifacts</artifactId>
+        <groupId>org.wso2.carbon.dcos.resources</groupId>
+        <artifactId>wso2-dcos-common</artifactId>
         <version>1.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>mesos-membership-scheme</artifactId>
+    <artifactId>dcos-membership-scheme</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Mesos Membership Scheme</name>
-    <description>Apache Mesos membership scheme for Carbon 4.2.0 and 4.4.x</description>
+    <name>WSO2 DC/OS Membership Scheme</name>
+    <description>Apache DC/OS membership scheme for Carbon 4.2.0 and 4.4.x</description>
     <version>1.0.1-SNAPSHOT</version>
 
     <dependencies>
