@@ -1,4 +1,4 @@
-## DC/OS Membership Scheme for WSO2 Carbon Platform
+# DC/OS Membership Scheme for WSO2 Carbon Platform
 
 DC/OS Membership Scheme is a WSO2 Carbon Kernel extension for automatically 
 discoverying WSO2 server clusters on [DC/OS](https://github.com/dcos/dcos) 
@@ -38,19 +38,17 @@ Similarly once a new member is added to the cluster, all existing members will c
 
 ## Configuration
 
-|Parameter|Required|Description|
-|:-------:|:---------:|:---------:|
-|MESOS_MEMBER_DISCOVERY_SCHEME|Yes|The cluster discovery scheme to be used: MesosDNS or Marathon.|
-|MARATHON_ENDPOINT|Yes if the value of MESOS_MEMBER_DISCOVERY_SCHEME is set to Marathon|The URL of the Marathon API.|
-|MESOS_DNS_ENDPOINT|Yes if the value of MESOS_MEMBER_DISCOVERY_SCHEME is set to MesosDNS|The URL of the Mesos DNS API.|
-|MARATHON_APPLICATIONS|Yes|A comma separated list of Marathon application names to be used for adding members to the WSO2 Carbon cluster.|
-|ENABLE_MARATHON_BASIC_AUTH|Yes if the value of MESOS_MEMBER_DISCOVERY_SCHEME is set to Marathon|Set value to true for enabling basic authentication for Marathon discovery scheme. If not set it to false.|
-|MARATHON_USERNAME|Yes if the value of ENABLE_MARATHON_BASIC_AUTH is set to true|The username for Marathon 
-API authentication process.|
-|MARATHON_PASSWORD|Yes if the value of ENABLE_MARATHON_BASIC_AUTH is set to true|The password for Marathon
-API authentication process.|
+| Parameter                     | Required | Description |
+|-------------------------------|----------|-------------|
+| MESOS_MEMBER_DISCOVERY_SCHEME | Yes      | The cluster discovery scheme to be used: MesosDNS or Marathon. |
+| MARATHON_ENDPOINT             | Yes if the value of MESOS_MEMBER_DISCOVERY_SCHEME is set to Marathon | The URL of the Marathon API. |
+| MESOS_DNS_ENDPOINT            | Yes if the value of MESOS_MEMBER_DISCOVERY_SCHEME is set to MesosDNS | The URL of the Mesos DNS API. |
+| MARATHON_APPLICATIONS         | Yes      | A comma separated list of Marathon application names to be used for adding members to the WSO2 Carbon cluster. |
+| ENABLE_MARATHON_BASIC_AUTH    | Yes if the value of MESOS_MEMBER_DISCOVERY_SCHEME is set to Marathon | Set value to true for enabling basic authentication for Marathon discovery scheme. If not set it to false. |
+| MARATHON_USERNAME             | Yes if the value of ENABLE_MARATHON_BASIC_AUTH is set to true | The username for Marathon API authentication process. |
+| MARATHON_PASSWORD             | Yes if the value of ENABLE_MARATHON_BASIC_AUTH is set to true | The password for Marathon API authentication process. |
 
-### Installation
+## Installation
 
 1. Apply Carbon kernel patch
       - For Carbon 4.2.0 based products: patch0012
