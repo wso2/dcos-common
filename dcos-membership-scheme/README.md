@@ -60,7 +60,7 @@ Similarly once a new member is added to the cluster, all existing members will c
 2. Copy following JAR file to <CARBON_HOME>repository/components/dropins directory.
 
     ```
-    mesos-membership-scheme-<version>.jar
+    dcos-membership-scheme-<version>.jar
     ```
 
 3. Update axis2.xml with the following configuration:
