@@ -1,4 +1,4 @@
-# Common DC/OS Resources for WSO2 Middleware
+# Common DC/OS Resources for WSO2 Carbon Platform
 
 This repository contains common DC/OS resources required for deploying WSO2
 Middleware on DC/OS.
